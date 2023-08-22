@@ -1,0 +1,20 @@
+[
+    {
+        "name": "Ivan",
+        "surname": "Ivanov",
+        "patronymic": "Ivanovich",
+        "organization_name": "SomeCoolOrg",
+        "work_phone": "1111111",
+        "personal_phone": "88001234567",
+        "id": 1
+    },
+    {
+        "name": "Сергей",
+        "surname": "Сергеев",
+        "patronymic": "Сергеевич",
+        "organization_name": "ДругаяКрутаяОрг",
+        "work_phone": "2222222",
+        "personal_phone": "88009876543",
+        "id": 2
+    }
+]
