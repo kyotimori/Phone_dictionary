@@ -1,6 +1,5 @@
 import json
 
-
 # Словарь для сопоставления названий полей в справочнике и названия столбцов для пользователя
 field_names = {"name": "Имя",
                "surname": "Фамилия",
@@ -13,15 +12,15 @@ field_names = {"name": "Имя",
 col_width = 25
 
 
-# Вывод шапки таблицы
-def print_table_header():
+def print_table_header() -> None:
+    """Вывод шапки таблицы"""
     for field in field_names.values():
         print(field.ljust(col_width), end='')
     print()
 
 
-# Получение существующих записей
-def get_existing_data(filename):
+def get_existing_data(filename) -> str:
+    """Получение существующих записей из файла"""
     try:
         with open(filename, 'r', encoding='utf-8') as json_file:
             return json.load(json_file)
@@ -29,16 +28,26 @@ def get_existing_data(filename):
         return "В справочнике пока нет записей"
 
 
-# Проверка корректности номера, можно также добавить проверку на длину или, например, код страны
-def check_phone(phone):
-    for sym in phone:
-        if not sym.isdigit():
-            return False
-    return True
+def validate_data(field, data) -> bool:
+    """Проверка корректности данных"""
+    if field == 'work_phone' or field == 'personal_phone':
+        for sym in data:
+            if not sym.isdigit():
+                print("Номер телефона должен состоять из цифр")
+                return False
+        return True
+    elif field != 'organization_name':
+        for sym in data:
+            if not sym.isalpha():
+                print("ФИО должно содержать только буквы")
+                return False
+        return True
+    else:
+        return True
 
 
-# Вывод всех записей на экран
-def get_data(filename):
+def get_data(filename) -> None:
+    """Вывод всех записей из файла на экран"""
     try:
         with open(filename, 'r', encoding='utf-8') as json_file:
             existing_data = json.load(json_file)
@@ -55,8 +64,8 @@ def get_data(filename):
         return
 
 
-# Добавление новой записи
-def add_data(filename):
+def add_data(filename) -> None:
+    """Добавление новой записи в файл"""
     new_data = {
         "name": "",
         "surname": "",
@@ -67,12 +76,10 @@ def add_data(filename):
     }
     # Ввод данных новой записи
     for field in new_data.keys():
-        temp = input(f"{field_names[field]}: ")
-        if field == "work_phone" or field == "personal_phone":
-            while not check_phone(temp):
-                print("Некорректный номер телефона")
-                temp = input(f"{field_names[field]}: ")
-        new_data[field] = temp
+        data = input(f"{field_names[field]}: ")
+        while not validate_data(field, data):
+            data = input(f"{field_names[field]}: ")
+        new_data[field] = data.title()
 
     # Получение существующих записей
     try:
@@ -100,8 +107,8 @@ def add_data(filename):
         json.dump(existing_data, json_file, indent=4)
 
 
-# Редактирование записи
-def edit_data(filename):
+def edit_data(filename) -> None:
+    """Редактирование существующей записи"""
     # Получение существующих записей
     existing_data = get_existing_data(filename)
 
@@ -116,12 +123,10 @@ def edit_data(filename):
             for field in current_row.keys():
                 if field == "id":
                     continue
-                temp = input(f"{field_names[field]}: ")
-                if field == "work_phone" or field == "personal_phone":
-                    while not check_phone(temp):
-                        print("Некорректный номер телефона")
-                        temp = input(f"{field_names[field]}: ")
-                current_row[field] = temp
+                data = input(f"{field_names[field]}: ")
+                while not validate_data(field, data):
+                    data = input(f"{field_names[field]}: ")
+                current_row[field] = data
 
             # Обновление данных в файле
             existing_data[int(index) - 1] = current_row
@@ -132,8 +137,8 @@ def edit_data(filename):
             print("Некорректный ввод")
 
 
-# Поиск записей по одной или нескольким характеристикам
-def search_data(filename):
+def search_data(filename) -> None:
+    """Поиск записей по одной или нескольким характеристикам"""
     # Получение существующих записей
     existing_data = get_existing_data(filename)
 
@@ -158,18 +163,19 @@ def search_data(filename):
         print()
 
 
-filename = 'book.json'
-options = {"1": get_data, "2": add_data, "3": edit_data, "4": search_data}
-while True:
-    option = input("Выберите опцию:\n"
-                   "1 - Вывод постранично записей из справочника на экран\n"
-                   "2 - Добавление новой записи в справочник\n"
-                   "3 - Редактирование существующей записи\n"
-                   "4 - Поиск записей\n"
-                   "Введите exit для выхода из программы\n")
-    if option == "exit":
-        break
-    if not options.get(option):
-        print("Некорректный ввод")
-    else:
-        options[option](filename)
+if __name__ == '__main__':
+    filename = 'book.json'
+    options = {"1": get_data, "2": add_data, "3": edit_data, "4": search_data}
+    while True:
+        option = input("Выберите опцию:\n"
+                       "1 - Вывод постранично записей из справочника на экран\n"
+                       "2 - Добавление новой записи в справочник\n"
+                       "3 - Редактирование существующей записи\n"
+                       "4 - Поиск записей\n"
+                       "Введите exit для выхода из программы\n")
+        if option == "exit":
+            break
+        if not options.get(option):
+            print("Некорректный ввод")
+        else:
+            options[option](filename)
